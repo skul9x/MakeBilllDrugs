@@ -1,0 +1,94 @@
+name: 🔢 Auto Version Bump
+
+# ─────────────────────────────────────────────────────────────────────
+# Trigger: mỗi khi push lên main
+# Mục đích: đọc version từ pubspec.yaml, bump minor (1.0→1.1→1.2...),
+#            commit pubspec.yaml [skip ci], rồi push tag vX.Y bằng PAT.
+#
+# ⚠️  YÊU CẦU: thêm secret GH_PAT vào repo Settings → Secrets & variables → Actions
+#     Value = token GitHub của bạn (classic PAT, scope: repo)
+#
+# Tại sao cần PAT?
+#   GITHUB_TOKEN không thể trigger workflow khác khi push commit/tag.
+#   PAT mới kích hoạt được release.yml ở workflow bên dưới.
+# ─────────────────────────────────────────────────────────────────────
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    name: 🔢 Bump minor version & create tag
+    runs-on: ubuntu-latest
+
+    # Bỏ qua nếu commit là do chính CI tạo ra (tránh vòng lặp vô hạn)
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !contains(github.event.head_commit.message, 'chore: bump version')
+
+    steps:
+      # ── Checkout với PAT (quan trọng!) ─────────────────────────
+      - name: ⬇️ Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+
+      # ── Git identity ─────────────────────────────────────────────
+      - name: 🪪 Configure Git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ── Đọc version từ pubspec.yaml và tính version mới ──────────
+      - name: 🏷️ Compute new version
+        id: ver
+        run: |
+          # Đọc dòng "version: 1.2+3" từ pubspec.yaml
+          FULL=$(grep -E '^version:' pubspec.yaml | head -1 \
+                 | sed -E 's/^version:[[:space:]]*//')
+          SEMVER="${FULL%%+*}"          # "1.2"
+          BUILD="${FULL##*+}"           # "3"
+
+          # Tách major.minor (thêm .0 phòng trường hợp chỉ có x.y)
+          IFS='.' read -r MAJOR MINOR _PATCH <<< "${SEMVER}.0"
+          NEW_MINOR=$((MINOR + 1))
+          NEW_BUILD=$((BUILD + 1))
+          NEW_VER="${MAJOR}.${NEW_MINOR}"
+          TAG="v${NEW_VER}"
+
+          echo "📌 ${SEMVER}+${BUILD}  →  ${NEW_VER}+${NEW_BUILD}  (tag: ${TAG})"
+
+          # Xuất ra GITHUB_OUTPUT để các bước sau dùng
+          echo "version=${NEW_VER}"       >> "$GITHUB_OUTPUT"
+          echo "new_build=${NEW_BUILD}"   >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}"               >> "$GITHUB_OUTPUT"
+
+      # ── Cập nhật pubspec.yaml ─────────────────────────────────────
+      - name: 📝 Update pubspec.yaml
+        run: |
+          NEW_VER="${{ steps.ver.outputs.version }}"
+          NEW_BUILD="${{ steps.ver.outputs.new_build }}"
+          sed -i -E \
+            "s|^(version:[[:space:]]*).*|\1${NEW_VER}+${NEW_BUILD}|" \
+            pubspec.yaml
+          echo "pubspec.yaml updated → version: ${NEW_VER}+${NEW_BUILD}"
+
+      # ── Commit pubspec.yaml với [skip ci] ─────────────────────────
+      - name: 💾 Commit version bump
+        run: |
+          git add pubspec.yaml
+          git commit -m "chore: bump version to ${{ steps.ver.outputs.version }} [skip ci]"
+
+      # ── Push commit + annotated tag bằng PAT ─────────────────────
+      # Dùng PAT → GitHub coi là "user action" → kích hoạt release.yml
+      - name: 🚀 Push commit & tag
+        run: |
+          git push origin main
+          git tag -a "${{ steps.ver.outputs.tag }}" \
+                  -m "Release ${{ steps.ver.outputs.tag }}"
+          git push origin "${{ steps.ver.outputs.tag }}"
+          echo "✅ Tag ${{ steps.ver.outputs.tag }} pushed → release.yml will start building"
