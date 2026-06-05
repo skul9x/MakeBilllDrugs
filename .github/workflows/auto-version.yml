@@ -77,11 +77,11 @@ jobs:
             pubspec.yaml
           echo "pubspec.yaml updated → version: ${NEW_VER}+${NEW_BUILD}"
 
-      # ── Commit pubspec.yaml với [skip ci] ─────────────────────────
+      # ── Commit pubspec.yaml ────────────────────────────────────────
       - name: 💾 Commit version bump
         run: |
           git add pubspec.yaml
-          git commit -m "chore: bump version to ${{ steps.ver.outputs.version }} [skip ci]"
+          git commit -m "chore: bump version to ${{ steps.ver.outputs.version }}"
 
       # ── Push commit + annotated tag bằng PAT ─────────────────────
       # Dùng PAT → GitHub coi là "user action" → kích hoạt release.yml
