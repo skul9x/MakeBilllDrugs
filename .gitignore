@@ -48,6 +48,8 @@ dist/
 
 # ── Test / Debug artifacts ────────────────────────────────────
 test_output.xlsx
+test_out.xlsx
+*.xlsx
 *.log
 
 # ── Linux packaging temp ──────────────────────────────────────
