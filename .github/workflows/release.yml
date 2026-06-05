@@ -1,0 +1,193 @@
+name: 🚀 Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'        # Kích hoạt khi push tag kiểu v1.0, v1.1, v2.0 ...
+
+permissions:
+  contents: write   # Cần để tạo GitHub Release và upload assets
+
+# ─────────────────────────────────────────────────────────────────
+# JOB 1 — Windows: Build Flutter + NSIS Installer (.exe)
+# ─────────────────────────────────────────────────────────────────
+jobs:
+  build-windows:
+    name: 🪟 Build Windows Installer (.exe)
+    runs-on: windows-latest
+
+    steps:
+      - name: ⬇️ Checkout source
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter (stable, cached)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Enable Windows desktop & get dependencies
+        run: |
+          flutter config --enable-windows-desktop
+          flutter pub get
+
+      - name: 🔨 Build Windows release
+        run: flutter build windows --release
+
+      # Trích version từ tag (v1.2 → 1.2)
+      - name: 🏷️ Extract version from tag
+        id: ver
+        shell: bash
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          echo "version=${VER}" >> "$GITHUB_OUTPUT"
+          echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      # Ghi file version.nsh để installer.nsi đọc
+      - name: 📝 Write version.nsh
+        shell: bash
+        run: |
+          echo '!define VERSION "${{ steps.ver.outputs.version }}"' > version.nsh
+
+      # Cài NSIS — dùng negrutiu/nsis-install hỗ trợ native amd64
+      - name: 🏗️ Install NSIS
+        uses: negrutiu/nsis-install@v2
+
+      # Compile installer bằng makensis
+      - name: 📦 Compile NSIS installer
+        shell: cmd
+        run: makensis installer.nsi
+
+      - name: ⬆️ Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: drugs-maker-flutter-${{ steps.ver.outputs.version }}-setup.exe
+          if-no-files-found: error
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 2 — Linux: Build Flutter + .deb Package
+  # ─────────────────────────────────────────────────────────────────
+  build-linux:
+    name: 🐧 Build Linux .deb Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout source
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter (stable, cached)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 🛠️ Install Linux desktop build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: 📦 Enable Linux desktop & get dependencies
+        run: |
+          flutter config --enable-linux-desktop
+          flutter pub get
+
+      - name: 🔨 Build Linux release
+        run: flutter build linux --release
+
+      - name: 🏷️ Extract version from tag
+        id: ver
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          echo "version=${VER}" >> "$GITHUB_OUTPUT"
+
+      - name: 📦 Build .deb package
+        env:
+          APP_VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          chmod +x build-deb.sh
+          ./build-deb.sh
+
+      - name: ⬆️ Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-deb
+          path: drugs-maker-flutter_${{ steps.ver.outputs.version }}_amd64.deb
+          if-no-files-found: error
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 3 — Publish GitHub Release (chờ cả 2 job trên xong)
+  # ─────────────────────────────────────────────────────────────────
+  release:
+    name: 📢 Publish GitHub Release
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏷️ Extract version from tag
+        id: ver
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          echo "version=${VER}" >> "$GITHUB_OUTPUT"
+
+      - name: ⬇️ Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+          path: ./dist
+
+      - name: ⬇️ Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-deb
+          path: ./dist
+
+      - name: 📋 List dist files (debug)
+        run: ls -lh ./dist/
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'
+        with:
+          name: "Drugs Maker v${{ steps.ver.outputs.version }}"
+          body: |
+            ## 💊 Drugs Maker v${{ steps.ver.outputs.version }}
+
+            ### 📥 Tải xuống / Download
+
+            | Hệ điều hành | File | Ghi chú |
+            |---|---|---|
+            | 🪟 **Windows 10/11** (64-bit) | `drugs-maker-flutter-${{ steps.ver.outputs.version }}-setup.exe` | Next → Next → Install vào `C:\Program Files\Drugs Maker` |
+            | 🐧 **Linux** Debian/Ubuntu | `drugs-maker-flutter_${{ steps.ver.outputs.version }}_amd64.deb` | Cài qua App Center hoặc dpkg |
+
+            ---
+
+            ### 🪟 Cài đặt trên Windows
+            1. Tải file `.exe` về.
+            2. Chạy → **Next** → **Next** → **Install**.
+            3. Ứng dụng cài vào `C:\Program Files\Drugs Maker\`.
+            4. Shortcut tự động tạo trên Desktop và Start Menu.
+
+            ### 🐧 Cài đặt trên Linux
+            ```bash
+            # Cách 1: Dùng apt (khuyến nghị, tự giải quyết dependencies)
+            sudo apt install ./drugs-maker-flutter_${{ steps.ver.outputs.version }}_amd64.deb
+
+            # Cách 2: dpkg trực tiếp
+            sudo dpkg -i drugs-maker-flutter_${{ steps.ver.outputs.version }}_amd64.deb
+
+            # Chạy ứng dụng
+            drugs-maker-flutter
+            ```
+
+            ---
+            **Copyright © Nguyễn Duy Trường 2026**
+          draft: false
+          prerelease: false
+          files: |
+            ./dist/drugs-maker-flutter-${{ steps.ver.outputs.version }}-setup.exe
+            ./dist/drugs-maker-flutter_${{ steps.ver.outputs.version }}_amd64.deb

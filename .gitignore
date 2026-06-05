@@ -1,54 +1,74 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# ============================================================
+# .gitignore cho Drugs Maker Flutter
+# Flutter (Windows/Linux desktop) + Python + Build artifacts
+# ============================================================
 
-# IntelliJ related
+# ── Flutter / Dart ───────────────────────────────────────────
+# Flutter build outputs
+/build/
+
+# Dart tool cache
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/
+
+# Pub cache / package lock (keep pubspec.lock for reproducible builds)
+# pubspec.lock  ← giữ lại để build reproducible
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Coverage
+coverage/
+
+# ── IDE / Editors ─────────────────────────────────────────────
+.idea/
+.vscode/
 *.iml
 *.ipr
 *.iws
-.idea/
+.DS_Store
+Thumbs.db
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-/coverage/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# Python Virtual Environment & Cache
-.venv/
+# ── Python ────────────────────────────────────────────────────
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+.eggs/
 
-# Output artifacts & Spreadsheet files
+# ── Test / Debug artifacts ────────────────────────────────────
+test_output.xlsx
+*.log
+
+# ── Linux packaging temp ──────────────────────────────────────
+debian-pack/
+
+# ── Linux .deb release files (generated) ─────────────────────
 *.deb
-*.xlsx
+
+# ── Windows NSIS build ────────────────────────────────────────
+# Generated installer (keep .nsi script, exclude built .exe)
+*-setup.exe
+
+# Auto-generated version header (written by CI)
+version.nsh
+
+# ── Git ───────────────────────────────────────────────────────
+*.orig
+*.rej
+
+# ── Secrets / Environment ─────────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
