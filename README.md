@@ -10,6 +10,9 @@ Chào mừng bạn đến với **Drugs Maker**, ứng dụng desktop đa nền 
   - Tự động cào thông tin thuốc từ URL trực tuyến (ví dụ: các trang nhà thuốc như Trung Tâm Thuốc, Nhà Thuốc Ngọc Anh,...) hoặc phân tích các bản sao HTML lưu trữ cục bộ.
   - Phân tích cú pháp DOM thông minh để trích xuất: **Tên thuốc** (Name), **Quy cách đóng gói** (Packaging Specification), và **Thương hiệu** (Brand).
   - Cơ chế dự phòng thông minh (regex fallback) khi cấu trúc DOM thay đổi.
+- **Nhập thuốc thủ công (Manual Input):**
+  - Nhập trực tiếp các thông tin thuốc gồm **Tên thuốc**, **Thương hiệu** và **Quy cách** ngay trên giao diện mà không cần thông qua liên kết URL.
+  - Hệ thống kiểm tra và loại bỏ trùng lặp (deduplication) thông minh: Nếu thuốc đã tồn tại trong danh sách (so sánh không phân biệt hoa thường đối với cả 3 trường thông tin), số lượng thuốc sẽ tự động được cộng dồn thay vì tạo dòng mới.
 - **Giao diện Glassmorphism cao cấp:** Giao diện tối hiện đại, sử dụng hiệu ứng Backdrop Filter tạo độ mờ gương sang trọng, kết hợp phông chữ *Outfit* và *Inter* tinh tế.
 - **Bảng dữ liệu tương tác thời gian thực (Reactive Live Table):**
   - Quản lý danh sách thuốc trực quan. Tự động tính toán lại chỉ số STT và tổng hợp số liệu (Tổng số dòng, Tổng số lượng sản phẩm).
@@ -19,7 +22,7 @@ Chào mừng bạn đến với **Drugs Maker**, ứng dụng desktop đa nền 
 - **Xuất nhập Excel chuẩn doanh nghiệp:**
   - Xuất dữ liệu ra file `.xlsx` với tiêu đề màu Slate-gray (`#E2E8F0`), font chữ Inter 11pt Bold, kẻ viền (borders) rõ ràng và căn chỉnh cột tối ưu.
   - Tự động căn chỉnh độ rộng cột dựa trên độ dài nội dung (tối ưu hóa ký tự Unicode/Tiếng Việt).
-  - Hỗ trợ nhập (Import) từ file Excel cũ để khôi phục trạng thái làm việc (tương thích mẫu 5 cột tiêu chuẩn hoặc 4 cột cũ).
+  - Hỗ trợ nhập (Import) từ file Excel để khôi phục trạng thái làm việc (tương thích mẫu 5 cột tiêu chuẩn hoặc 4 cột cũ).
 - **Kiểm thử E2E & Đóng gói:**
   - Bộ kiểm thử tích hợp (Integration Tests) bằng Dart và kịch bản kiểm tra chất lượng Excel bằng Python (`openpyxl`).
   - Kịch bản tự động đóng gói Linux Debian (`.deb`).
@@ -43,7 +46,7 @@ Hệ thống mã nguồn được tổ chức khoa học theo mô hình kiến t
     - [dialog_service_impl.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/dialog_service_impl.dart): Triển khai thực tế giao diện hộp thoại với `file_picker`.
     - [mock_dialog_service.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/mock_dialog_service.dart): Phiên bản mock hỗ trợ chạy kiểm thử tự động.
   - 📂 **[views/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views)**: Giao diện người dùng.
-    - [dashboard_page.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/dashboard_page.dart): Màn hình điều khiển chính với bố cục Grid, bảng hiển thị dữ liệu và vùng nhập liệu.
+    - [dashboard_page.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/dashboard_page.dart): Màn hình điều khiển chính hỗ trợ chuyển đổi linh hoạt hai chế độ nhập: Smart Import & Manual Input.
     - 📂 **[widgets/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets)**: Các thành phần giao diện nhỏ tái sử dụng.
       - [glass_card.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets/glass_card.dart): Khung hiển thị hiệu ứng gương mờ.
       - [quantity_selector.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets/quantity_selector.dart): Bộ tăng giảm số lượng sản phẩm.
@@ -54,9 +57,13 @@ Hệ thống mã nguồn được tổ chức khoa học theo mô hình kiến t
   - [dialog_service_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/dialog_service_test.dart): Kiểm thử các hành vi hộp thoại file.
   - [ui_widget_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/ui_widget_test.dart): Kiểm thử giao diện và hành động bấm nút.
   - [e2e_excel_generation_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/e2e_excel_generation_test.dart): Sinh file Excel thử nghiệm (`test_output.xlsx`) phục vụ kiểm tra E2E.
+  - [manual_input_unit_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/manual_input_unit_test.dart): Unit tests xác minh logic ràng buộc dữ liệu thủ công.
+  - [manual_input_ui_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/manual_input_ui_test.dart): Widget tests kiểm tra chuyển đổi thẻ và thêm thủ công trên Dashboard.
+  - [manual_input_excel_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/manual_input_excel_test.dart): Integration tests xuất nhập Excel cho các mục thêm thủ công.
 - 📂 **[tests/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests)**: Các kịch bản kiểm thử tự động bằng Python.
-  - [verify_app.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/verify_app.py): Sử dụng `openpyxl` để xác minh trực tiếp cấu trúc dòng, cột, font chữ và màu sắc của file Excel được xuất ra.
+  - [verify_app.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/verify_app.py): Sử dụng `openpyxl` để xác minh cấu trúc dòng, cột, font chữ và màu sắc của file Excel được xuất ra.
   - Kịch bản kiểm chứng theo giai đoạn: [test-phase-01.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-phase-01.py) đến [test-phase-05.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-phase-05.py).
+  - Kịch bản kiểm chứng nhập thủ công: [test-manual-input-phase-01.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-manual-input-phase-01.py) đến [test-manual-input-phase-03.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-manual-input-phase-03.py).
 - ⚙️ **[pubspec.yaml](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/pubspec.yaml)**: File cấu hình các thư viện phụ thuộc của Flutter.
 - 📄 **[build-deb.sh](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/build-deb.sh)**: Script bash hỗ trợ biên dịch và đóng gói ứng dụng thành file cài đặt `.deb` chạy trên Linux.
 
@@ -112,13 +119,13 @@ Dự án đi kèm bộ script tự động hóa toàn diện giúp xác minh ch�
 flutter test
 ```
 
-### Chạy kiểm thử End-to-End toàn diện (Python):
-Bộ kiểm thử sẽ biên dịch bản Release, chạy đóng gói `.deb` và xác thực cấu trúc & giao diện của file Excel đầu ra:
+### Chạy kiểm thử End-to-End cho phần Nhập thủ công (Python):
+Bộ kiểm thử sẽ biên dịch bản Release, chạy đóng gói `.deb`, kích hoạt kiểm thử tích hợp Excel và xác thực cấu trúc & giao diện của file Excel đầu ra:
 ```bash
-python3 tests/test-phase-05.py
+python3 tests/test-manual-input-phase-03.py
 ```
 Nếu tất cả kiểm tra hợp lệ, bạn sẽ nhận được thông báo:
-`[SUCCESS] ALL PHASE 05 E2E VERIFICATION AND PACKAGING CHECKS PASSED!`
+`[SUCCESS] ALL PHASE 03 E2E VERIFICATION AND PACKAGING CHECKS PASSED!`
 
 ---
 
@@ -146,15 +153,17 @@ Sản phẩm biên dịch nằm tại thư mục `build/windows/x64/release/bund
 
 ## 👨‍💻 Hướng dẫn Sử dụng Ứng dụng
 
-1. **Nhập nguồn thuốc:** Nhập đường dẫn link URL trực tiếp của thuốc hoặc nhập đường dẫn file HTML cục bộ trong ô *Add Drug Source*.
-2. **Chọn số lượng:** Sử dụng bộ chọn số lượng bên dưới và bấm nút **Fetch & Add**.
-3. **Quản lý danh sách:** 
+1. **Nhập nguồn thuốc:** 
+   - **Smart Import:** Nhập đường dẫn link URL trực tiếp của thuốc hoặc nhập đường dẫn file HTML cục bộ trong ô *Add Drug Source*, chọn số lượng rồi nhấn **Fetch & Add**.
+   - **Manual Input:** Chuyển qua thẻ *Manual Input*, nhập các thông tin thuốc thủ công gồm **Tên thuốc**, **Thương hiệu** và **Quy cách**, chọn số lượng rồi nhấn **Add Manually**.
+2. **Quản lý danh sách:** 
    - Danh sách thuốc sẽ xuất hiện trên bảng bên phải.
    - Bạn có thể chỉnh sửa trực tiếp số lượng bằng cách bấm nút tăng/giảm ở cột *Số lượng*.
    - Nhấn nút `X` (đỏ) ở cuối dòng để xóa thuốc.
    - Sử dụng phím **Mũi tên Lên / Xuống** trên bàn phím để chọn dòng.
-4. **Xuất Excel:** Bấm nút **Export Excel**, chọn vị trí lưu file `.xlsx`. Mở file để xem bảng dữ liệu đã được định dạng chuẩn doanh nghiệp.
-5. **Nhập dữ liệu cũ:** Bấm nút **Import Excel**, chọn file Excel đã xuất trước đó để khôi phục nhanh trạng thái danh sách trên bảng điều khiển.
+3. **Xuất Excel:** Bấm nút **Export Excel**, chọn vị trí lưu file `.xlsx`. Mở file để xem bảng dữ liệu đã được định dạng chuẩn doanh nghiệp.
+4. **Nhập dữ liệu cũ:** Bấm nút **Import Excel**, chọn file Excel đã xuất trước đó để khôi phục nhanh trạng thái danh sách trên bảng điều khiển.
 
 ---
-*Phát triển bởi đội ngũ và cộng đồng Drugs Maker.*
+
+**Copyright © Nguyễn Duy Trường 2026**
