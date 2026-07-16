@@ -60,7 +60,7 @@ Section "Main Application" SecMain
   SetOutPath "$INSTDIR"
 
   ; ⚠️  Flutter Windows build output: build\windows\x64\runner\Release\
-  ;     Bao gồm .exe, .dll và thư mục data\
+  ;     Bao gồm .exe, .dll và thư mục data
   File /r "build\windows\x64\runner\Release\*.*"
 
   ; Start Menu shortcuts
