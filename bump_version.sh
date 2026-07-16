@@ -26,8 +26,8 @@ FULL_VERSION=$(grep -E '^version:' "$PUBSPEC" | head -1 \
 SEMVER="${FULL_VERSION%%+*}"     # phần trước "+"
 BUILD="${FULL_VERSION##*+}"      # phần sau  "+"
 
-# Tách major.minor.patch (thêm .0 nếu chỉ có 2 thành phần)
-IFS='.' read -r MAJOR MINOR PATCH <<< "${SEMVER}.0"
+# Tách major.minor.patch (thêm .0.0 nếu thiếu)
+IFS='.' read -r MAJOR MINOR PATCH <<< "${SEMVER}.0.0"
 PATCH="${PATCH:-0}"
 
 echo "🔖 Version hiện tại : ${SEMVER}  (build: ${BUILD})"
@@ -45,12 +45,8 @@ esac
 
 NEW_BUILD=$((BUILD + 1))
 
-# Bỏ phần .0 ở cuối nếu patch = 0 (1.2.0 → 1.2, nhưng 1.2.3 giữ nguyên)
-if [[ "$PATCH" == "0" ]]; then
-  NEW_SEMVER="${MAJOR}.${MINOR}"
-else
-  NEW_SEMVER="${MAJOR}.${MINOR}.${PATCH}"
-fi
+# Luôn luôn đảm bảo định dạng 3 số chuẩn Flutter (x.y.z)
+NEW_SEMVER="${MAJOR}.${MINOR}.${PATCH}"
 
 TAG="v${NEW_SEMVER}"
 echo "🚀 Version mới      : ${NEW_SEMVER}  (build: ${NEW_BUILD})  →  tag: ${TAG}"

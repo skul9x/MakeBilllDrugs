@@ -47,17 +47,21 @@ jobs:
       - name: 🏷️ Compute new version
         id: ver
         run: |
-          # Đọc dòng "version: 1.2+3" từ pubspec.yaml
+          # Đọc dòng "version: 1.2.0+3" từ pubspec.yaml
           FULL=$(grep -E '^version:' pubspec.yaml | head -1 \
                  | sed -E 's/^version:[[:space:]]*//')
-          SEMVER="${FULL%%+*}"          # "1.2"
-          BUILD="${FULL##*+}"           # "3"
+          SEMVER="${FULL%%+*}"
+          BUILD="${FULL##*+}"
 
-          # Tách major.minor (thêm .0 phòng trường hợp chỉ có x.y)
-          IFS='.' read -r MAJOR MINOR _PATCH <<< "${SEMVER}.0"
+          # Tách major.minor.patch (thêm .0.0 phòng trường hợp thiếu)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${SEMVER}.0.0"
+          
           NEW_MINOR=$((MINOR + 1))
+          NEW_PATCH=0
           NEW_BUILD=$((BUILD + 1))
-          NEW_VER="${MAJOR}.${NEW_MINOR}"
+          
+          # Luôn đảm bảo định dạng 3 số chuẩn Flutter (x.y.z)
+          NEW_VER="${MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
           TAG="v${NEW_VER}"
 
           echo "📌 ${SEMVER}+${BUILD}  →  ${NEW_VER}+${NEW_BUILD}  (tag: ${TAG})"
