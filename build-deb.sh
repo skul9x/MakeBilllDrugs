@@ -28,17 +28,21 @@ echo "║   Building .deb  version ${DEB_VERSION}       ║"
 echo "╚══════════════════════════════════════════╝"
 
 # ── 1. Build Flutter Linux release ───────────────────────────
-echo "🔨 Building Flutter Linux release..."
-FLUTTER_CMD="flutter"
-for p in \
-  "$HOME/development/flutter/bin/flutter" \
-  "$HOME/flutter/bin/flutter" \
-  "/opt/flutter/bin/flutter" \
-  "/snap/flutter/current/flutter/bin/flutter"; do
-  if [[ -f "$p" ]]; then FLUTTER_CMD="$p"; break; fi
-done
+if [[ -z "${SKIP_BUILD:-}" ]]; then
+  echo "🔨 Building Flutter Linux release..."
+  FLUTTER_CMD="flutter"
+  for p in \
+    "$HOME/development/flutter/bin/flutter" \
+    "$HOME/flutter/bin/flutter" \
+    "/opt/flutter/bin/flutter" \
+    "/snap/flutter/current/flutter/bin/flutter"; do
+    if [[ -f "$p" ]]; then FLUTTER_CMD="$p"; break; fi
+  done
 
-$FLUTTER_CMD build linux --release
+  $FLUTTER_CMD build linux --release
+else
+  echo "⏭️ SKIP_BUILD is set to true. Skipping Flutter build step."
+fi
 
 # ── 2. Chuẩn bị cây thư mục Debian ──────────────────────────
 echo "📁 Setting up Debian package structure..."

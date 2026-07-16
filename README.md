@@ -17,7 +17,7 @@ Chào mừng bạn đến với **Drugs Maker**, ứng dụng desktop đa nền 
 - **Bảng dữ liệu tương tác thời gian thực (Reactive Live Table):**
   - Quản lý danh sách thuốc trực quan. Tự động tính toán lại chỉ số STT và tổng hợp số liệu (Tổng số dòng, Tổng số lượng sản phẩm).
   - Tích hợp phím tắt: Sử dụng phím mũi tên `ArrowUp` / `ArrowDown` để điều hướng nhanh giữa các dòng.
-  - Bộ điều chỉnh số lượng ([QuantitySelector](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets/quantity_selector.dart)) tích hợp trực tiếp trên bảng.
+  - Bộ điều chỉnh số lượng ([quantity_selector.dart](lib/views/widgets/quantity_selector.dart)) tích hợp trực tiếp trên bảng.
   - Hệ thống thông báo toast overlay sinh động cho mọi trạng thái (Thành công, Cảnh báo, Lỗi).
 - **Xuất nhập Excel chuẩn doanh nghiệp:**
   - Xuất dữ liệu ra file `.xlsx` với tiêu đề màu Slate-gray (`#E2E8F0`), font chữ Inter 11pt Bold, kẻ viền (borders) rõ ràng và căn chỉnh cột tối ưu.
@@ -25,7 +25,7 @@ Chào mừng bạn đến với **Drugs Maker**, ứng dụng desktop đa nền 
   - Hỗ trợ nhập (Import) từ file Excel để khôi phục trạng thái làm việc (tương thích mẫu 5 cột tiêu chuẩn hoặc 4 cột cũ).
 - **Kiểm thử E2E & Đóng gói:**
   - Bộ kiểm thử tích hợp (Integration Tests) bằng Dart và kịch bản kiểm tra chất lượng Excel bằng Python (`openpyxl`).
-  - Kịch bản tự động đóng gói Linux Debian (`.deb`).
+  - Kịch bản tự động đóng gói Linux Debian (`.deb`) và Windows Installer (`.exe`).
 
 ---
 
@@ -33,45 +33,47 @@ Chào mừng bạn đến với **Drugs Maker**, ứng dụng desktop đa nền 
 
 Hệ thống mã nguồn được tổ chức khoa học theo mô hình kiến trúc Flutter sạch sẽ:
 
-- 📂 **[lib/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib)**: Mã nguồn Dart chính của ứng dụng.
-  - 📂 **[core/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/core)**: Chứa cấu hình chủ đề giao diện ứng dụng.
-    - [theme.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/core/theme.dart): Định nghĩa bảng màu Glassmorphism ([GlassTheme](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/core/theme.dart)), font chữ Google Fonts và hiệu ứng Blur.
-  - 📂 **[models/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/models)**: Chứa định nghĩa các thực thể dữ liệu.
-    - [drug_info.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/models/drug_info.dart): Đại diện thông tin thuốc thô cào được ([DrugInfo](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/models/drug_info.dart)).
-    - [drug_item.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/models/drug_item.dart): Thực thể quản lý dòng trong hóa đơn thuốc gồm STT và Số lượng ([DrugItem](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/models/drug_item.dart)).
-  - 📂 **[services/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services)**: Chức năng xử lý logic nghiệp vụ.
-    - [drug_parser.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/drug_parser.dart): Thực hiện tải trang HTTP, phân tích DOM để trích xuất Tên, Quy cách, Thương hiệu của thuốc.
-    - [excel_service.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/excel_service.dart): Xử lý xuất Excel định dạng cao cấp và nhập Excel phục hồi dữ liệu.
-    - [dialog_service.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/dialog_service.dart): Giao diện gọi hộp thoại chọn file hệ thống.
-    - [dialog_service_impl.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/dialog_service_impl.dart): Triển khai thực tế giao diện hộp thoại với `file_picker`.
-    - [mock_dialog_service.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/services/mock_dialog_service.dart): Phiên bản mock hỗ trợ chạy kiểm thử tự động.
-  - 📂 **[views/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views)**: Giao diện người dùng.
-    - [dashboard_page.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/dashboard_page.dart): Màn hình điều khiển chính hỗ trợ chuyển đổi linh hoạt hai chế độ nhập: Smart Import & Manual Input.
-    - 📂 **[widgets/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets)**: Các thành phần giao diện nhỏ tái sử dụng.
-      - [glass_card.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets/glass_card.dart): Khung hiển thị hiệu ứng gương mờ.
-      - [quantity_selector.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets/quantity_selector.dart): Bộ tăng giảm số lượng sản phẩm.
-      - [toast_overlay.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/views/widgets/toast_overlay.dart): Hiển thị thông báo trạng thái dạng overlay nổi.
-  - [main.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/lib/main.dart): Điểm chạy chính của ứng dụng.
-- 📂 **[test/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test)**: Thư mục kiểm thử của Flutter (Dart).
-  - [core_logic_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/core_logic_test.dart): Kiểm thử parser phân tích HTML cục bộ.
-  - [dialog_service_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/dialog_service_test.dart): Kiểm thử các hành vi hộp thoại file.
-  - [ui_widget_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/ui_widget_test.dart): Kiểm thử giao diện và hành động bấm nút.
-  - [e2e_excel_generation_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/e2e_excel_generation_test.dart): Sinh file Excel thử nghiệm (`test_output.xlsx`) phục vụ kiểm tra E2E.
-  - [manual_input_unit_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/manual_input_unit_test.dart): Unit tests xác minh logic ràng buộc dữ liệu thủ công.
-  - [manual_input_ui_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/manual_input_ui_test.dart): Widget tests kiểm tra chuyển đổi thẻ và thêm thủ công trên Dashboard.
-  - [manual_input_excel_test.dart](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/test/manual_input_excel_test.dart): Integration tests xuất nhập Excel cho các mục thêm thủ công.
-- 📂 **[tests/](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests)**: Các kịch bản kiểm thử tự động bằng Python.
-  - [verify_app.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/verify_app.py): Sử dụng `openpyxl` để xác minh cấu trúc dòng, cột, font chữ và màu sắc của file Excel được xuất ra.
-  - Kịch bản kiểm chứng theo giai đoạn: [test-phase-01.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-phase-01.py) đến [test-phase-05.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-phase-05.py).
-  - Kịch bản kiểm chứng nhập thủ công: [test-manual-input-phase-01.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-manual-input-phase-01.py) đến [test-manual-input-phase-03.py](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/tests/test-manual-input-phase-03.py).
-- ⚙️ **[pubspec.yaml](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/pubspec.yaml)**: File cấu hình các thư viện phụ thuộc của Flutter.
-- 📄 **[build-deb.sh](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/build-deb.sh)**: Script bash hỗ trợ biên dịch và đóng gói ứng dụng thành file cài đặt `.deb` chạy trên Linux.
+- 📂 **[lib/](lib)**: Mã nguồn Dart chính của ứng dụng.
+  - 📂 **[core/](lib/core)**: Chứa cấu hình chủ đề giao diện ứng dụng.
+    - [theme.dart](lib/core/theme.dart): Định nghĩa bảng màu Glassmorphism (`GlassTheme`), font chữ Google Fonts và hiệu ứng Blur.
+  - 📂 **[models/](lib/models)**: Chứa định nghĩa các thực thể dữ liệu.
+    - [drug_info.dart](lib/models/drug_info.dart): Đại diện thông tin thuốc thô cào được (`DrugInfo`).
+    - [drug_item.dart](lib/models/drug_item.dart): Thực thể quản lý dòng trong hóa đơn thuốc gồm STT và Số lượng (`DrugItem`).
+  - 📂 **[services/](lib/services)**: Chức năng xử lý logic nghiệp vụ.
+    - [drug_parser.dart](lib/services/drug_parser.dart): Thực hiện tải trang HTTP, phân tích DOM để trích xuất Tên, Quy cách, Thương hiệu của thuốc.
+    - [excel_service.dart](lib/services/excel_service.dart): Xử lý xuất Excel định dạng cao cấp và nhập Excel phục hồi dữ liệu.
+    - [dialog_service.dart](lib/services/dialog_service.dart): Giao diện gọi hộp thoại chọn file hệ thống.
+    - [dialog_service_impl.dart](lib/services/dialog_service_impl.dart): Triển khai thực tế giao diện hộp thoại với `file_picker`.
+    - [mock_dialog_service.dart](lib/services/mock_dialog_service.dart): Phiên bản mock hỗ trợ chạy kiểm thử tự động.
+  - 📂 **[views/](lib/views)**: Giao diện người dùng.
+    - [dashboard_page.dart](lib/views/dashboard_page.dart): Màn hình điều khiển chính hỗ trợ chuyển đổi linh hoạt hai chế độ nhập: Smart Import & Manual Input.
+    - 📂 **[widgets/](lib/views/widgets)**: Các thành phần giao diện nhỏ tái sử dụng.
+      - [glass_card.dart](lib/views/widgets/glass_card.dart): Khung hiển thị hiệu ứng gương mờ.
+      - [quantity_selector.dart](lib/views/widgets/quantity_selector.dart): Bộ tăng giảm số lượng sản phẩm.
+      - [toast_overlay.dart](lib/views/widgets/toast_overlay.dart): Hiển thị thông báo trạng thái dạng overlay nổi.
+  - [main.dart](lib/main.dart): Điểm chạy chính của ứng dụng.
+- 📂 **[test/](test)**: Thư mục kiểm thử của Flutter (Dart).
+  - [core_logic_test.dart](test/core_logic_test.dart): Kiểm thử parser phân tích HTML cục bộ.
+  - [dialog_service_test.dart](test/dialog_service_test.dart): Kiểm thử các hành vi hộp thoại file.
+  - [ui_widget_test.dart](test/ui_widget_test.dart): Kiểm thử giao diện và hành động bấm nút.
+  - [e2e_excel_generation_test.dart](test/e2e_excel_generation_test.dart): Sinh file Excel thử nghiệm (`test_output.xlsx`) phục vụ kiểm tra E2E.
+  - [manual_input_unit_test.dart](test/manual_input_unit_test.dart): Unit tests xác minh logic ràng buộc dữ liệu thủ công.
+  - [manual_input_ui_test.dart](test/manual_input_ui_test.dart): Widget tests kiểm tra chuyển đổi thẻ và thêm thủ công trên Dashboard.
+  - [manual_input_excel_test.dart](test/manual_input_excel_test.dart): Integration tests xuất nhập Excel cho các mục thêm thủ công.
+- 📂 **[tests/](tests)**: Các kịch bản kiểm thử tự động bằng Python.
+  - [verify_app.py](tests/verify_app.py): Sử dụng `openpyxl` để xác minh cấu trúc dòng, cột, font chữ và màu sắc của file Excel được xuất ra.
+  - Kịch bản kiểm chứng theo giai đoạn: `test-phase-01.py` đến `test-phase-05.py`.
+  - Kịch bản kiểm chứng nhập thủ công: `test-manual-input-phase-01.py` đến `test-manual-input-phase-03.py`.
+- ⚙️ **[pubspec.yaml](pubspec.yaml)**: File cấu hình các thư viện phụ thuộc của Flutter.
+- 📄 **[build-deb.sh](build-deb.sh)**: Script bash hỗ trợ biên dịch và đóng gói ứng dụng thành file cài đặt `.deb` chạy trên Linux.
+- 📄 **[bump_version.sh](bump_version.sh)**: Script bash hỗ trợ tự động tăng phiên bản và push tag lên GitHub.
+- 📄 **[installer.nsi](installer.nsi)**: Cấu hình kịch bản tạo file cài đặt Windows Installer (`.exe`) bằng NSIS.
 
 ---
 
 ## 🛠️ Công nghệ Sử dụng
 
-Các thư viện chính cấu thành nên dự án (được khai báo tại [pubspec.yaml](file:///home/skul9x/Desktop/Test_code/Drugs%20Maker%20Flutter/pubspec.yaml)):
+Các thư viện chính cấu thành nên dự án (được khai báo tại [pubspec.yaml](pubspec.yaml)):
 
 - **[http](https://pub.dev/packages/http):** Gửi yêu cầu HTTP kèm User-Agent giả lập trình duyệt để cào dữ liệu HTML.
 - **[html](https://pub.dev/packages/html):** Hỗ trợ duyệt qua cây DOM thông qua bộ chọn CSS selectors.
@@ -129,25 +131,30 @@ Nếu tất cả kiểm tra hợp lệ, bạn sẽ nhận được thông báo:
 
 ---
 
-## 📦 Biên dịch và Đóng gói Release
+## 🤖 Quy trình CI/CD & Đóng gói Tự động (GitHub Actions)
 
-### Trên Linux (Đóng gói `.deb`)
-Chúng tôi cung cấp script tự động biên dịch và gom gói file cài đặt Debian chỉ bằng một lệnh:
-```bash
-chmod +x build-deb.sh
-./build-deb.sh
-```
-Kết quả đầu ra sẽ tạo ra file **`drugs-maker-flutter_1.0.0_amd64.deb`** ngay tại thư mục gốc của dự án. File này chứa:
-- Binary đã tối ưu hóa biên dịch đặt tại `/opt/drugs-maker-flutter/`.
-- File shortcut menu ứng dụng (`.desktop`) cài đặt tại `/usr/share/applications/`.
-- Lệnh chạy tiện lợi từ terminal qua `drugs-maker-flutter`.
+Dự án tích hợp hệ thống CI/CD thông qua GitHub Actions giúp tự động hóa quá trình đóng gói và phát hành ứng dụng (Windows & Linux).
 
-### Trên Windows
-Chạy lệnh biên dịch mặc định của Flutter:
+### Cơ chế hoạt động của CI/CD:
+1. **Auto Version Bump:** Khi lập trình viên push thay đổi lên nhánh `main`, workflow [.github/workflows/auto-version.yml](.github/workflows/auto-version.yml) sẽ tự động tính toán số phiên bản mới, cập nhật `pubspec.yaml`, thực hiện commit và tạo tag (ví dụ: `v1.3`) rồi push ngược lên GitHub.
+2. **Build & Release:** Sự kiện push tag mới sẽ kích hoạt workflow [.github/workflows/release.yml](.github/workflows/release.yml).
+   - **Job Windows:** Chạy trên môi trường `windows-latest`, build ứng dụng và sử dụng NSIS để đóng gói thành tệp cài đặt `.exe`.
+   - **Job Linux:** Chạy trên môi trường `ubuntu-latest`, tối ưu hóa bỏ qua bước build trùng lặp bằng cờ `SKIP_BUILD` và gọi [build-deb.sh](build-deb.sh) để đóng gói thành tệp `.deb`.
+   - **Job Release:** Tải các file cài đặt từ hai job trên, sử dụng cơ chế Glob Pattern động để nhận dạng chính xác tên file và đính kèm trực tiếp vào mục **GitHub Release**.
+
+### Công cụ Bump Version thủ công:
+Bạn có thể tự tăng phiên bản và kích hoạt phát hành bản release ngay tại máy cục bộ bằng script `bump_version.sh`:
 ```bash
-flutter build windows --release
+# Tăng số minor (ví dụ từ 1.2 lên 1.3)
+./bump_version.sh minor
+
+# Tăng số patch (ví dụ từ 1.2.0 lên 1.2.1)
+./bump_version.sh patch
+
+# Tăng số major (ví dụ từ 1.2 lên 2.0)
+./bump_version.sh major
 ```
-Sản phẩm biên dịch nằm tại thư mục `build/windows/x64/release/bundle/`. Hãy đóng gói toàn bộ thư mục này dưới dạng file `.zip` để chia sẻ di động.
+Script sẽ tự động commit phiên bản mới, tạo tag và hỏi bạn có muốn push thẳng lên GitHub để kích hoạt CI/CD hay không.
 
 ---
 
