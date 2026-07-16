@@ -70,6 +70,27 @@ void main() {
       expect(info.brand, equals('N/A'));
       expect(info.quyCach, equals('Hộp 10 vỉ x 10 viên nang. Brand: Abbott'));
     });
+
+    test('Parser extracts from Long Chau Hapacol HTML file', () async {
+      final info = await parser.fetchAndParse('LongChau/Bột sủi Hapacol 150 vị cam hạ sốt, giảm đau cho trẻ (24 gói).html');
+      expect(info.name, equals('Bột Hapacol 150 DHG giảm đau, hạ sốt (24 gói)'));
+      expect(info.brand, equals('DHG'));
+      expect(info.quyCach, equals('Hộp 24 Gói'));
+    });
+
+    test('Parser extracts from Long Chau 123.html file', () async {
+      final info = await parser.fetchAndParse('LongChau/123.html');
+      expect(info.name, equals('Viên nén Paracetamol Stada 500mg điều trị các cơn đau đầu, đau thần kinh, đau răng (10 vỉ x 10 viên)'));
+      expect(info.brand, equals('DHG'));
+      expect(info.quyCach, equals('Hộp 10 Vỉ x 10 Viên'));
+    });
+
+    test('Parser extracts from Long Chau 456-aug.html file', () async {
+      final info = await parser.fetchAndParse('LongChau/456-aug.html');
+      expect(info.name, equals('Thuốc Augmentin 1g GSK điều trị nhiễm khuẩn (2 vỉ x 7 viên)'));
+      expect(info.brand, equals('SMITHKLINE BEECHAM PHARMACEUTICALS'));
+      expect(info.quyCach, equals('Hộp 2 Vỉ x 7 Viên'));
+    });
   });
 
   group('ExcelService Tests', () {

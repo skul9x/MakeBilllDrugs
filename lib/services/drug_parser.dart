@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 import '../models/drug_info.dart';
@@ -15,6 +16,9 @@ class DrugParser {
   Future<DrugInfo> extractDrugInfo(String htmlContent) async {
     var document = parse(htmlContent);
 
+    bool isLongChau = htmlContent.contains('nhathuoclongchau.com.vn') ||
+                      htmlContent.contains('Nhà thuốc Long Châu');
+
     // 1. Drug Name
     var nameNode = document.querySelector('h1');
     if (nameNode == null) {
@@ -27,14 +31,46 @@ class DrugParser {
 
     // 2. Quy Cách
     String quyCach = '';
-    var trs = document.querySelectorAll('tr');
-    for (var tr in trs) {
-      if (quyCach.isNotEmpty) break;
-      var cells = tr.querySelectorAll('td');
-      if (cells.length >= 2) {
-        var firstCellText = cells[0].text.trim().toLowerCase();
-        if (firstCellText.contains('quy cách đóng gói') || firstCellText == 'đóng gói') {
-          quyCach = cells[1].text;
+    if (isLongChau) {
+      var allElements = document.querySelectorAll('*');
+      for (var element in allElements) {
+        var txt = element.text.trim().toLowerCase();
+        if ((txt == 'quy cách' || txt == 'quy cách:') && element.children.isEmpty) {
+          var parent = element.parent;
+          if (parent != null) {
+            var sibling = parent.nextElementSibling;
+            if (sibling != null) {
+              quyCach = sibling.text.trim();
+              break;
+            }
+          }
+        }
+      }
+
+      if (quyCach.isEmpty) {
+        var nextDataNode = document.querySelector('script#__NEXT_DATA__');
+        if (nextDataNode != null) {
+          try {
+            final data = json.decode(nextDataNode.text);
+            final spec = data['props']?['pageProps']?['product']?['specification'];
+            if (spec != null && spec.toString().trim().isNotEmpty) {
+              quyCach = spec.toString().trim();
+            }
+          } catch (_) {}
+        }
+      }
+    }
+
+    if (quyCach.isEmpty) {
+      var trs = document.querySelectorAll('tr');
+      for (var tr in trs) {
+        if (quyCach.isNotEmpty) break;
+        var cells = tr.querySelectorAll('td');
+        if (cells.length >= 2) {
+          var firstCellText = cells[0].text.trim().toLowerCase();
+          if (firstCellText.contains('quy cách đóng gói') || firstCellText == 'đóng gói') {
+            quyCach = cells[1].text;
+          }
         }
       }
     }
@@ -74,23 +110,57 @@ class DrugParser {
 
     // 3. Brand (Thương hiệu)
     String brand = '';
-    var brandNode = document.querySelector('#cs-thuong-hieu');
-    if (brandNode != null) {
-      var cells = brandNode.querySelectorAll('td');
-      if (cells.length >= 2) {
-        brand = cells[1].text;
-      } else {
-        brand = brandNode.text;
+    if (isLongChau) {
+      var nextDataNode = document.querySelector('script#__NEXT_DATA__');
+      if (nextDataNode != null) {
+        try {
+          final data = json.decode(nextDataNode.text);
+          final producer = data['props']?['pageProps']?['product']?['producer'];
+          if (producer != null && producer.toString().trim().isNotEmpty) {
+            brand = producer.toString().trim();
+          }
+        } catch (_) {}
+      }
+
+      if (brand.isEmpty) {
+        var allElements = document.querySelectorAll('*');
+        for (var element in allElements) {
+          var txt = element.text.trim().toLowerCase();
+          if (txt == 'nhà sản xuất' || txt == 'nhà sản xuất:') {
+            var parent = element.parent;
+            if (parent != null) {
+              var sibling = parent.nextElementSibling;
+              if (sibling != null) {
+                brand = sibling.text.trim();
+                break;
+              }
+            }
+          } else if (txt.startsWith('nhà sản xuất:')) {
+            var parts = element.text.split(':');
+            brand = parts.sublist(1).join(':').trim();
+            break;
+          }
+        }
       }
     } else {
-      var trs = document.querySelectorAll('tr');
-      for (var tr in trs) {
-        if (brand.isNotEmpty) break;
-        var cells = tr.querySelectorAll('td');
+      var brandNode = document.querySelector('#cs-thuong-hieu');
+      if (brandNode != null) {
+        var cells = brandNode.querySelectorAll('td');
         if (cells.length >= 2) {
-          var firstCellText = cells[0].text.trim().toLowerCase();
-          if (firstCellText.contains('thương hiệu') || firstCellText == 'brand') {
-            brand = cells[1].text;
+          brand = cells[1].text;
+        } else {
+          brand = brandNode.text;
+        }
+      } else {
+        var trs = document.querySelectorAll('tr');
+        for (var tr in trs) {
+          if (brand.isNotEmpty) break;
+          var cells = tr.querySelectorAll('td');
+          if (cells.length >= 2) {
+            var firstCellText = cells[0].text.trim().toLowerCase();
+            if (firstCellText.contains('thương hiệu') || firstCellText == 'brand') {
+              brand = cells[1].text;
+            }
           }
         }
       }
