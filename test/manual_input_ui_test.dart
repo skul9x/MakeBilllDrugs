@@ -44,6 +44,7 @@ void main() {
     expect(find.byKey(const ValueKey('nameField')), findsOneWidget);
     expect(find.byKey(const ValueKey('brandField')), findsOneWidget);
     expect(find.byKey(const ValueKey('quyCachField')), findsOneWidget);
+    expect(find.byKey(const ValueKey('manualInputQuantity')), findsOneWidget);
     expect(find.byKey(const ValueKey('addManuallyButton')), findsOneWidget);
   });
 
@@ -102,5 +103,63 @@ void main() {
 
     // The count of units (quantity selector values) should be 2
     expect(find.text('2'), findsWidgets);
+  });
+
+  testWidgets('Manual Input UI Tests - Keyboard Quantity Input & Aggregation', (WidgetTester tester) async {
+    final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.ensureInitialized();
+    await binding.setSurfaceSize(const Size(1280, 800));
+
+    final mockDialogService = MockDialogService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DashboardPage(dialogService: mockDialogService),
+      ),
+    );
+
+    // Switch to Manual Input
+    await tester.tap(find.byKey(const ValueKey('tabManualInput')));
+    await tester.pumpAndSettle();
+
+    final manualQtyFinder = find.byKey(const ValueKey('manualInputQuantity'));
+    final qtyInputFinder = find.descendant(
+      of: manualQtyFinder,
+      matching: find.byKey(const ValueKey('quantity_selector_input')),
+    );
+    expect(qtyInputFinder, findsOneWidget);
+    expect(tester.widget<TextField>(qtyInputFinder).controller?.text, '1');
+
+    // Fill form and type quantity 50
+    await tester.enterText(find.byKey(const ValueKey('nameField')), 'Augmentin 1g');
+    await tester.enterText(find.byKey(const ValueKey('brandField')), 'GSK');
+    await tester.enterText(find.byKey(const ValueKey('quyCachField')), 'Hộp 14 viên');
+    await tester.enterText(qtyInputFinder, '50');
+    await tester.pumpAndSettle();
+
+    // Tap add
+    await tester.tap(find.byKey(const ValueKey('addManuallyButton')));
+    await tester.pumpAndSettle();
+
+    // Verify item added with quantity 50
+    expect(find.text('Augmentin 1g'), findsOneWidget);
+    expect(find.text('50'), findsWidgets);
+
+    // Verify quantity input reset to 1
+    expect(tester.widget<TextField>(qtyInputFinder).controller?.text, '1');
+
+    // Add duplicate with typed quantity 25
+    await tester.enterText(find.byKey(const ValueKey('nameField')), 'Augmentin 1g');
+    await tester.enterText(find.byKey(const ValueKey('brandField')), 'GSK');
+    await tester.enterText(find.byKey(const ValueKey('quyCachField')), 'Hộp 14 viên');
+    await tester.enterText(qtyInputFinder, '25');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('addManuallyButton')));
+    await tester.pumpAndSettle();
+
+    // Total quantity should now be 75 (50 + 25)
+    expect(find.text('75'), findsWidgets);
+    // Quantity input reset back to 1
+    expect(tester.widget<TextField>(qtyInputFinder).controller?.text, '1');
   });
 }

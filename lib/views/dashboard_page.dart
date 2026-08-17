@@ -25,8 +25,9 @@ enum InputMode { smartImport, manualInput }
 
 class DashboardPage extends StatefulWidget {
   final DialogService? dialogService;
+  final DrugParser? drugParser;
 
-  const DashboardPage({Key? key, this.dialogService}) : super(key: key);
+  const DashboardPage({Key? key, this.dialogService, this.drugParser}) : super(key: key);
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -34,7 +35,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   late final DialogService _dialogService;
-  final DrugParser _drugParser = DrugParser();
+  late final DrugParser _drugParser;
   final ExcelService _excelService = ExcelService();
 
   final TextEditingController _urlController = TextEditingController();
@@ -57,6 +58,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     _dialogService = widget.dialogService ?? DialogServiceImpl();
+    _drugParser = widget.drugParser ?? DrugParser();
   }
 
   @override
@@ -162,6 +164,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             QuantitySelector(
+              key: const ValueKey('smartImportQuantity'),
               value: _inputQuantity,
               onChanged: (val) {
                 setState(() {
@@ -299,6 +302,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             QuantitySelector(
+              key: const ValueKey('manualInputQuantity'),
               value: _inputQuantity,
               onChanged: (val) {
                 setState(() {

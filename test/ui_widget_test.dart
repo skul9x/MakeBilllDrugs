@@ -28,7 +28,7 @@ void main() {
     expect(find.text('Add Drug Source'), findsOneWidget);
 
     // Verify text field exists
-    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byKey(const ValueKey('urlField')), findsOneWidget);
 
     // Verify quantity selector exists
     expect(find.byType(QuantitySelector), findsWidgets);
