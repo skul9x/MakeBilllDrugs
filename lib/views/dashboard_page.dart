@@ -22,6 +22,7 @@ class SelectPreviousRowIntent extends Intent {
 }
 
 enum InputMode { smartImport, manualInput }
+enum MobileViewTab { input, table }
 
 class DashboardPage extends StatefulWidget {
   final DialogService? dialogService;
@@ -520,6 +521,8 @@ class _DashboardPageState extends State<DashboardPage> {
     return _items.fold(0, (sum, item) => sum + item.quantity);
   }
 
+  MobileViewTab _mobileViewTab = MobileViewTab.input;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -564,324 +567,35 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Title
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final bool isMobile = constraints.maxWidth < 768;
+
+                return Padding(
+                  padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Header Section
+                      _buildHeader(isMobile),
+                      SizedBox(height: isMobile ? 12.0 : 20.0),
+
+                      // Mobile Tab Switcher (Visible only on compact screens)
+                      if (isMobile) ...[
+                        _buildMobileTabSwitcher(),
+                        const SizedBox(height: 14.0),
+                      ],
+
+                      // Content Area
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Drugs Maker', style: GlassTheme.headerStyle),
-                            const SizedBox(height: 4.0),
-                            Text('Premium Glassmorphism Manager', style: GlassTheme.subHeaderStyle, overflow: TextOverflow.ellipsis),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      // Stats Badges
-                      Row(
-                        children: [
-                          _buildStatBadge('Rows', '${_items.length}'),
-                          const SizedBox(width: 12.0),
-                          _buildStatBadge('Total Units', '$_totalProductUnits'),
-                        ],
+                        child: isMobile
+                            ? _buildMobileContent()
+                            : _buildDesktopContent(),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24.0),
-
-                  // Content Area (Split Grid Layout)
-                  Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Left Panel: Input Section
-                        SizedBox(
-                          width: 320,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                GlassCard(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Add Drug Source',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Outfit',
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16.0),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.05),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: Colors.white.withOpacity(0.1)),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: GestureDetector(
-                                                key: const ValueKey('tabSmartImport'),
-                                                onTap: () {
-                                                  setState(() {
-                                                    _inputMode = InputMode.smartImport;
-                                                  });
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                                  decoration: BoxDecoration(
-                                                    color: _inputMode == InputMode.smartImport
-                                                        ? GlassTheme.primaryNeon.withOpacity(0.15)
-                                                        : Colors.transparent,
-                                                    borderRadius: BorderRadius.circular(11),
-                                                    border: _inputMode == InputMode.smartImport
-                                                        ? Border.all(color: GlassTheme.primaryNeon, width: 1.5)
-                                                        : Border.all(color: Colors.transparent, width: 1.5),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Smart Import',
-                                                      style: TextStyle(
-                                                        color: _inputMode == InputMode.smartImport ? Colors.white : Colors.white60,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontFamily: 'Outfit',
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: GestureDetector(
-                                                key: const ValueKey('tabManualInput'),
-                                                onTap: () {
-                                                  setState(() {
-                                                    _inputMode = InputMode.manualInput;
-                                                  });
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                                  decoration: BoxDecoration(
-                                                    color: _inputMode == InputMode.manualInput
-                                                        ? GlassTheme.primaryNeon.withOpacity(0.15)
-                                                        : Colors.transparent,
-                                                    borderRadius: BorderRadius.circular(11),
-                                                    border: _inputMode == InputMode.manualInput
-                                                        ? Border.all(color: GlassTheme.primaryNeon, width: 1.5)
-                                                        : Border.all(color: Colors.transparent, width: 1.5),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Manual Input',
-                                                      style: TextStyle(
-                                                        color: _inputMode == InputMode.manualInput ? Colors.white : Colors.white60,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontFamily: 'Outfit',
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16.0),
-                                      AnimatedSwitcher(
-                                        duration: const Duration(milliseconds: 300),
-                                        child: _inputMode == InputMode.smartImport
-                                            ? _buildSmartImportFields()
-                                            : _buildManualInputFields(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              const SizedBox(height: 20),
-                              // Control actions
-                              GlassCard(
-                                child: Column(
-                                  children: [
-                                    _buildActionButton(
-                                      label: 'Import Excel',
-                                      icon: Icons.file_upload_outlined,
-                                      color: GlassTheme.secondaryNeon,
-                                      onPressed: _importFromExcel,
-                                    ),
-                                    const SizedBox(height: 12.0),
-                                    _buildActionButton(
-                                      label: 'Export Excel',
-                                      icon: Icons.file_download_outlined,
-                                      color: GlassTheme.primaryNeon,
-                                      onPressed: _exportToExcel,
-                                    ),
-                                    const SizedBox(height: 12.0),
-                                    _buildActionButton(
-                                      label: 'Clear All',
-                                      icon: Icons.delete_sweep_outlined,
-                                      color: GlassTheme.dangerNeon,
-                                      onPressed: _clearAll,
-                                    ),
-                                  ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 24.0),
-
-                        // Right Panel: Table View
-                        Expanded(
-                          child: GlassCard(
-                            padding: EdgeInsets.zero,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Table Header
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.06),
-                                    border: Border(
-                                      bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(width: 40, child: Text('STT', style: GlassTheme.tableHeaderStyle)),
-                                      Expanded(flex: 3, child: Text('Tên thuốc', style: GlassTheme.tableHeaderStyle)),
-                                      Expanded(flex: 2, child: Text('Thương hiệu', style: GlassTheme.tableHeaderStyle)),
-                                      Expanded(flex: 2, child: Text('Quy cách', style: GlassTheme.tableHeaderStyle)),
-                                      SizedBox(width: 120, child: Text('Số lượng', style: GlassTheme.tableHeaderStyle)),
-                                      const SizedBox(width: 40), // For remove action
-                                    ],
-                                  ),
-                                ),
-
-                                // Table Body
-                                Expanded(
-                                  child: _items.isEmpty
-                                      ? Center(
-                                          child: Text(
-                                            'No drug items parsed yet.',
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(0.5),
-                                              fontFamily: 'Inter',
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        )
-                                      : ListView.builder(
-                                          itemCount: _items.length,
-                                          itemBuilder: (context, index) {
-                                            final item = _items[index];
-                                            final isSelected = _selectedRowIndex == index;
-
-                                            return GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _selectedRowIndex = index;
-                                                });
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                                                decoration: BoxDecoration(
-                                                  color: isSelected
-                                                      ? GlassTheme.primaryNeon.withOpacity(0.1)
-                                                      : index % 2 == 0
-                                                          ? Colors.white.withOpacity(0.02)
-                                                          : Colors.transparent,
-                                                  border: Border(
-                                                    bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    // STT
-                                                    SizedBox(
-                                                      width: 40,
-                                                      child: Text(
-                                                        '${item.stt}',
-                                                        style: GlassTheme.tableBodyStyle.copyWith(
-                                                          color: isSelected ? GlassTheme.primaryNeon : Colors.white70,
-                                                          fontWeight: isSelected ? FontWeight.bold : null,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    // Name
-                                                    Expanded(
-                                                      flex: 3,
-                                                      child: Text(
-                                                        item.name,
-                                                        style: GlassTheme.tableBodyStyle.copyWith(
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    // Brand
-                                                    Expanded(
-                                                      flex: 2,
-                                                      child: Text(
-                                                        item.brand,
-                                                        style: GlassTheme.tableBodyStyle,
-                                                      ),
-                                                    ),
-                                                    // Quy Cach
-                                                    Expanded(
-                                                      flex: 2,
-                                                      child: Text(
-                                                        item.quyCach,
-                                                        style: GlassTheme.tableBodyStyle,
-                                                      ),
-                                                    ),
-                                                    // Quantity Selector
-                                                    SizedBox(
-                                                      width: 120,
-                                                      child: Align(
-                                                        alignment: Alignment.centerLeft,
-                                                        child: QuantitySelector(
-                                                          value: item.quantity,
-                                                          onChanged: (newQty) => _updateQuantity(index, newQty),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    // Remove action
-                                                    SizedBox(
-                                                      width: 40,
-                                                      child: IconButton(
-                                                        icon: const Icon(Icons.close, color: GlassTheme.dangerNeon, size: 18),
-                                                        onPressed: () => _removeItem(index),
-                                                        tooltip: 'Remove Row',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ),
@@ -889,9 +603,499 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildStatBadge(String label, String value) {
+  Widget _buildHeader(bool isMobile) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Drugs Maker',
+                style: isMobile
+                    ? GlassTheme.headerStyle.copyWith(fontSize: 22)
+                    : GlassTheme.headerStyle,
+              ),
+              const SizedBox(height: 4.0),
+              Text(
+                'Premium Glassmorphism Manager',
+                style: isMobile
+                    ? GlassTheme.subHeaderStyle.copyWith(fontSize: 12)
+                    : GlassTheme.subHeaderStyle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12.0),
+        // Stats Badges
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildStatBadge('Rows', '${_items.length}', isMobile),
+            SizedBox(width: isMobile ? 8.0 : 12.0),
+            _buildStatBadge('Units', '$_totalProductUnits', isMobile),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileTabSwitcher() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              key: const ValueKey('mobileTabInput'),
+              onTap: () {
+                setState(() {
+                  _mobileViewTab = MobileViewTab.input;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: _mobileViewTab == MobileViewTab.input
+                      ? GlassTheme.primaryNeon.withOpacity(0.18)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(11),
+                  border: _mobileViewTab == MobileViewTab.input
+                      ? Border.all(color: GlassTheme.primaryNeon, width: 1.5)
+                      : Border.all(color: Colors.transparent, width: 1.5),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.edit_note,
+                        size: 16,
+                        color: _mobileViewTab == MobileViewTab.input ? GlassTheme.primaryNeon : Colors.white60,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          'Nhập liệu',
+                          style: TextStyle(
+                            color: _mobileViewTab == MobileViewTab.input ? Colors.white : Colors.white60,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Outfit',
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              key: const ValueKey('mobileTabTable'),
+              onTap: () {
+                setState(() {
+                  _mobileViewTab = MobileViewTab.table;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: _mobileViewTab == MobileViewTab.table
+                      ? GlassTheme.primaryNeon.withOpacity(0.18)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(11),
+                  border: _mobileViewTab == MobileViewTab.table
+                      ? Border.all(color: GlassTheme.primaryNeon, width: 1.5)
+                      : Border.all(color: Colors.transparent, width: 1.5),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.table_chart_outlined,
+                        size: 16,
+                        color: _mobileViewTab == MobileViewTab.table ? GlassTheme.primaryNeon : Colors.white60,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          'Bảng thuốc (${_items.length})',
+                          style: TextStyle(
+                            color: _mobileViewTab == MobileViewTab.table ? Colors.white : Colors.white60,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Outfit',
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopContent() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left Panel: Input Section
+        SizedBox(
+          width: 320,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildInputFormCard(),
+                const SizedBox(height: 20),
+                _buildActionButtonsCard(),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 24.0),
+
+        // Right Panel: Table View
+        Expanded(
+          child: _buildTableCard(isMobile: false),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileContent() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      child: _mobileViewTab == MobileViewTab.input
+          ? SingleChildScrollView(
+              key: const ValueKey('mobileInputView'),
+              child: Column(
+                children: [
+                  _buildInputFormCard(),
+                  const SizedBox(height: 16),
+                  _buildActionButtonsCard(),
+                ],
+              ),
+            )
+          : _buildTableCard(isMobile: true),
+    );
+  }
+
+  Widget _buildInputFormCard() {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Add Drug Source',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Outfit',
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    key: const ValueKey('tabSmartImport'),
+                    onTap: () {
+                      setState(() {
+                        _inputMode = InputMode.smartImport;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _inputMode == InputMode.smartImport
+                            ? GlassTheme.primaryNeon.withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(11),
+                        border: _inputMode == InputMode.smartImport
+                            ? Border.all(color: GlassTheme.primaryNeon, width: 1.5)
+                            : Border.all(color: Colors.transparent, width: 1.5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Smart Import',
+                          style: TextStyle(
+                            color: _inputMode == InputMode.smartImport ? Colors.white : Colors.white60,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Outfit',
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    key: const ValueKey('tabManualInput'),
+                    onTap: () {
+                      setState(() {
+                        _inputMode = InputMode.manualInput;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _inputMode == InputMode.manualInput
+                            ? GlassTheme.primaryNeon.withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(11),
+                        border: _inputMode == InputMode.manualInput
+                            ? Border.all(color: GlassTheme.primaryNeon, width: 1.5)
+                            : Border.all(color: Colors.transparent, width: 1.5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Manual Input',
+                          style: TextStyle(
+                            color: _inputMode == InputMode.manualInput ? Colors.white : Colors.white60,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Outfit',
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _inputMode == InputMode.smartImport
+                ? _buildSmartImportFields()
+                : _buildManualInputFields(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtonsCard() {
+    return GlassCard(
+      child: Column(
+        children: [
+          _buildActionButton(
+            label: 'Import Excel',
+            icon: Icons.file_upload_outlined,
+            color: GlassTheme.secondaryNeon,
+            onPressed: _importFromExcel,
+          ),
+          const SizedBox(height: 12.0),
+          _buildActionButton(
+            label: 'Export Excel',
+            icon: Icons.file_download_outlined,
+            color: GlassTheme.primaryNeon,
+            onPressed: _exportToExcel,
+          ),
+          const SizedBox(height: 12.0),
+          _buildActionButton(
+            label: 'Clear All',
+            icon: Icons.delete_sweep_outlined,
+            color: GlassTheme.dangerNeon,
+            onPressed: _clearAll,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTableCard({required bool isMobile}) {
+    const double tableMinWidth = 560.0;
+
+    Widget tableHeader = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 40, child: Text('STT', style: GlassTheme.tableHeaderStyle)),
+          Expanded(flex: 3, child: Text('Tên thuốc', style: GlassTheme.tableHeaderStyle)),
+          Expanded(flex: 2, child: Text('Thương hiệu', style: GlassTheme.tableHeaderStyle)),
+          Expanded(flex: 2, child: Text('Quy cách', style: GlassTheme.tableHeaderStyle)),
+          SizedBox(width: 120, child: Text('Số lượng', style: GlassTheme.tableHeaderStyle)),
+          const SizedBox(width: 40), // For remove action
+        ],
+      ),
+    );
+
+    Widget tableBody = _items.isEmpty
+        ? Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Text(
+                'No drug items parsed yet.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontFamily: 'Inter',
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          )
+        : ListView.builder(
+            itemCount: _items.length,
+            itemBuilder: (context, index) {
+              final item = _items[index];
+              final isSelected = _selectedRowIndex == index;
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedRowIndex = index;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? GlassTheme.primaryNeon.withOpacity(0.1)
+                        : index % 2 == 0
+                            ? Colors.white.withOpacity(0.02)
+                            : Colors.transparent,
+                    border: Border(
+                      bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // STT
+                      SizedBox(
+                        width: 40,
+                        child: Text(
+                          '${item.stt}',
+                          style: GlassTheme.tableBodyStyle.copyWith(
+                            color: isSelected ? GlassTheme.primaryNeon : Colors.white70,
+                            fontWeight: isSelected ? FontWeight.bold : null,
+                          ),
+                        ),
+                      ),
+                      // Name
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          item.name,
+                          style: GlassTheme.tableBodyStyle.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      // Brand
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          item.brand,
+                          style: GlassTheme.tableBodyStyle,
+                        ),
+                      ),
+                      // Quy Cach
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          item.quyCach,
+                          style: GlassTheme.tableBodyStyle,
+                        ),
+                      ),
+                      // Quantity Selector
+                      SizedBox(
+                        width: 120,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: QuantitySelector(
+                            value: item.quantity,
+                            onChanged: (newQty) => _updateQuantity(index, newQty),
+                          ),
+                        ),
+                      ),
+                      // Remove action
+                      SizedBox(
+                        width: 40,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: GlassTheme.dangerNeon, size: 18),
+                          onPressed: () => _removeItem(index),
+                          tooltip: 'Remove Row',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: tableMinWidth,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          tableHeader,
+                          Expanded(child: tableBody),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                tableHeader,
+                Expanded(child: tableBody),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildStatBadge(String label, String value, [bool isMobile = false]) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 10.0 : 16.0,
+        vertical: isMobile ? 6.0 : 8.0,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.08),
         borderRadius: BorderRadius.circular(10.0),
@@ -902,18 +1106,18 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           Text(
             '$label: ',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white70,
-              fontSize: 12,
+              fontSize: isMobile ? 11 : 12,
               fontFamily: 'Inter',
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: GlassTheme.primaryNeon,
               fontWeight: FontWeight.bold,
-              fontSize: 12,
+              fontSize: isMobile ? 11 : 12,
               fontFamily: 'Outfit',
             ),
           ),
