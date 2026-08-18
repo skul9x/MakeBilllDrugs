@@ -16,10 +16,6 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-subprojects {
     afterEvaluate {
         if (project.extensions.findByName("android") != null) {
             configure<com.android.build.gradle.BaseExtension> {
@@ -27,6 +23,10 @@ subprojects {
             }
         }
     }
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {
