@@ -74,3 +74,9 @@ version.nsh
 .env.*
 *.pem
 *.key
+*.jks
+*.keystore
+**/android/key.properties
+**/android/app/key.properties
+**/android/local.properties
+
