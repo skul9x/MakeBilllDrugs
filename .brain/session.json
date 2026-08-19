@@ -1,0 +1,47 @@
+{
+  "updated_at": "2026-08-18T19:31:00Z",
+  "working_on": {
+    "feature": "Android Platform Support & Responsive UI",
+    "task": "Automated Multi-Platform Release & Mobile UX",
+    "status": "completed",
+    "files": [
+      "lib/views/dashboard_page.dart",
+      "android/app/build.gradle.kts",
+      "android/build.gradle.kts",
+      "android/app/src/main/AndroidManifest.xml",
+      ".github/workflows/release.yml",
+      "test/responsive_ui_test.dart"
+    ],
+    "blockers": [],
+    "notes": "CI/CD now automatically builds Windows .exe, Linux .deb, and Android signed .apk simultaneously."
+  },
+  "recent_changes": [
+    {
+      "timestamp": "2026-08-18T19:15:00Z",
+      "type": "feature",
+      "description": "Implemented Responsive UI for Mobile & Desktop with LayoutBuilder and horizontal scrolling table.",
+      "files": ["lib/views/dashboard_page.dart", "test/responsive_ui_test.dart"]
+    },
+    {
+      "timestamp": "2026-08-18T19:25:00Z",
+      "type": "bugfix",
+      "description": "Configured subprojects compileSdk 36 before evaluationDependsOn and fixed storeFile path in release.yml.",
+      "files": ["android/build.gradle.kts", ".github/workflows/release.yml"]
+    }
+  ],
+  "decisions_made": [
+    {
+      "decision": "Use LayoutBuilder with 768px breakpoint for Mobile/Desktop adaptive UI",
+      "reason": "Allows desktop users to keep full 2-column view while mobile phone users get comfortable tab-based navigation."
+    },
+    {
+      "decision": "Wrap mobile table in SingleChildScrollView with minWidth 560px",
+      "reason": "Prevents cramped columns and text wrapping on narrow phone portrait screens."
+    },
+    {
+      "decision": "Release signing via GitHub Secrets ANDROID_KEYSTORE_BASE64",
+      "reason": "Keeps private keystores out of git while automating release APK signing."
+    }
+  ],
+  "pending_tasks": []
+}

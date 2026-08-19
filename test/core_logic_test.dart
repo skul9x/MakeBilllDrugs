@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:drugs_maker/models/drug_info.dart';
 import 'package:drugs_maker/models/drug_item.dart';
 import 'package:drugs_maker/services/drug_parser.dart';
 import 'package:drugs_maker/services/excel_service.dart';
@@ -120,16 +119,16 @@ void main() {
       expect(importedItems.length, equals(2));
 
       expect(importedItems[0].stt, equals(1));
-      expect(importedItems[0].name, equals('Paracetamol'));
-      expect(importedItems[0].brand, equals('An Thiên'));
-      expect(importedItems[0].quyCach, equals('Hộp 10 vỉ x 10 viên'));
-      expect(importedItems[0].quantity, equals(5));
+      expect(importedItems[0].name, equals('Ibuprofen'));
+      expect(importedItems[0].brand, equals('Mekophar'));
+      expect(importedItems[0].quyCach, equals('Chai 100 viên'));
+      expect(importedItems[0].quantity, equals(10));
 
       expect(importedItems[1].stt, equals(2));
-      expect(importedItems[1].name, equals('Ibuprofen'));
-      expect(importedItems[1].brand, equals('Mekophar'));
-      expect(importedItems[1].quyCach, equals('Chai 100 viên'));
-      expect(importedItems[1].quantity, equals(10));
+      expect(importedItems[1].name, equals('Paracetamol'));
+      expect(importedItems[1].brand, equals('An Thiên'));
+      expect(importedItems[1].quyCach, equals('Hộp 10 vỉ x 10 viên'));
+      expect(importedItems[1].quantity, equals(5));
     });
   });
 }

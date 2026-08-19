@@ -26,15 +26,16 @@ class ExcelService {
   }
 
   Future<void> generateExcel(List<DrugItem> items, String outputPath) async {
+    final sortedItems = DrugItem.sortAndReindex(items);
     final excel = Excel.createExcel();
     const sheetName = 'Sheet1';
     final sheet = excel[sheetName];
 
-    // Slate-gray header background (#E2E8F0), Inter font, cell borders, correct alignments
+    // Slate-gray header background (#E2E8F0), Times New Roman font, cell borders, correct alignments
     final headerStyle = CellStyle(
       bold: true,
-      fontSize: 11,
-      fontFamily: 'Inter',
+      fontSize: 12,
+      fontFamily: 'Times New Roman',
       fontColorHex: ExcelColor.fromHexString('#FF1A202C'),
       backgroundColorHex: ExcelColor.fromHexString('#FFE2E8F0'),
       horizontalAlign: HorizontalAlign.Center,
@@ -46,8 +47,8 @@ class ExcelService {
     );
 
     final dataLeftStyle = CellStyle(
-      fontSize: 10,
-      fontFamily: 'Inter',
+      fontSize: 12,
+      fontFamily: 'Times New Roman',
       horizontalAlign: HorizontalAlign.Left,
       verticalAlign: VerticalAlign.Center,
       leftBorder: Border(borderStyle: BorderStyle.Thin, borderColorHex: ExcelColor.fromHexString('#FFE2E8F0')),
@@ -57,8 +58,8 @@ class ExcelService {
     );
 
     final dataCenterStyle = CellStyle(
-      fontSize: 10,
-      fontFamily: 'Inter',
+      fontSize: 12,
+      fontFamily: 'Times New Roman',
       horizontalAlign: HorizontalAlign.Center,
       verticalAlign: VerticalAlign.Center,
       leftBorder: Border(borderStyle: BorderStyle.Thin, borderColorHex: ExcelColor.fromHexString('#FFE2E8F0')),
@@ -75,11 +76,11 @@ class ExcelService {
       cell.value = TextCellValue(headers[i]);
       cell.cellStyle = headerStyle;
     }
-    sheet.setRowHeight(0, 26.0);
+    sheet.setRowHeight(0, 28.0);
 
     // 2. Write Data Rows
-    for (int i = 0; i < items.length; i++) {
-      final item = items[i];
+    for (int i = 0; i < sortedItems.length; i++) {
+      final item = sortedItems[i];
       final rowIdx = i + 1;
 
       final cellSTT = sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIdx));
@@ -102,13 +103,13 @@ class ExcelService {
       cellQty.value = IntCellValue(item.quantity);
       cellQty.cellStyle = dataCenterStyle;
 
-      sheet.setRowHeight(rowIdx, 20.0);
+      sheet.setRowHeight(rowIdx, 24.0);
     }
 
     // 3. Auto-fit column widths with UTF-8 character length optimization
     for (int colIdx = 0; colIdx < headers.length; colIdx++) {
-      int maxLen = 10;
-      for (int rowIdx = 0; rowIdx <= items.length; rowIdx++) {
+      double maxLen = 0;
+      for (int rowIdx = 0; rowIdx <= sortedItems.length; rowIdx++) {
         final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: colIdx, rowIndex: rowIdx));
         if (cell.value != null) {
           String valStr = '';
@@ -120,16 +121,19 @@ class ExcelService {
           } else {
             valStr = val.toString();
           }
-          int runeLen = valStr.runes.length;
-          if (valStr.length > runeLen) {
-            runeLen = (runeLen * 1.15).toInt();
+          double effectiveLen = valStr.runes.length.toDouble();
+          if (valStr.length > valStr.runes.length || valStr.runes.any((r) => r > 127)) {
+            effectiveLen = effectiveLen * 1.25;
           }
-          if (runeLen > maxLen) {
-            maxLen = runeLen;
+          if (effectiveLen > maxLen) {
+            maxLen = effectiveLen;
           }
         }
       }
-      final double width = maxLen.toDouble() + 4;
+      double width = maxLen + 5.0;
+      if (width < 12.0) {
+        width = 12.0;
+      }
       sheet.setColumnWidth(colIdx, width);
     }
 
@@ -211,12 +215,12 @@ class ExcelService {
       String qtyVal = '';
 
       if (isLegacy) {
-        if (row.length > 0) sttVal = _getCellString(row[0]).trim();
+        if (row.isNotEmpty) sttVal = _getCellString(row[0]).trim();
         if (row.length > 1) nameVal = _getCellString(row[1]).trim();
         if (row.length > 2) quyCachVal = _getCellString(row[2]).trim();
         if (row.length > 3) qtyVal = _getCellString(row[3]).trim();
       } else {
-        if (row.length > 0) sttVal = _getCellString(row[0]).trim();
+        if (row.isNotEmpty) sttVal = _getCellString(row[0]).trim();
         if (row.length > 1) nameVal = _getCellString(row[1]).trim();
         if (row.length > 2) brandVal = _getCellString(row[2]).trim();
         if (row.length > 3) quyCachVal = _getCellString(row[3]).trim();

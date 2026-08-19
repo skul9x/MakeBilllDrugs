@@ -7,11 +7,11 @@ class QuantitySelector extends StatefulWidget {
   final int min;
 
   const QuantitySelector({
-    Key? key,
+    super.key,
     required this.value,
     required this.onChanged,
     this.min = 1,
-  }) : super(key: key);
+  });
 
   @override
   State<QuantitySelector> createState() => _QuantitySelectorState();
@@ -71,9 +71,9 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

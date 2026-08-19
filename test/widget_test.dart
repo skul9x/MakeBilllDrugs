@@ -12,7 +12,7 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     // Verify that DashboardPage is displayed by checking for its main header.
-    expect(find.text('Drugs Maker'), findsOneWidget);
+    expect(find.text('Tạo bill thuốc'), findsOneWidget);
     expect(find.text('Premium Glassmorphism Manager'), findsOneWidget);
     expect(find.byType(DashboardPage), findsOneWidget);
   });

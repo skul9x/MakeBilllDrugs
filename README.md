@@ -1,6 +1,6 @@
-# Drugs Maker — Trình quản lý Hóa đơn thuốc Cao cấp (Flutter Desktop)
+# Tạo bill thuốc — Trình quản lý Hóa đơn thuốc Cao cấp (Flutter Desktop)
 
-Chào mừng bạn đến với **Drugs Maker**, ứng dụng desktop đa nền tảng (hỗ trợ Linux và Windows) được phát triển bằng Dart và Flutter. Đây là bản viết lại nâng cấp từ ứng dụng `Make-Bill` chạy trên Wails, mang lại giao diện Glassmorphism thời thượng, hiệu năng vượt trội và quy trình phân tích dữ liệu hiệu quả.
+Chào mừng bạn đến với **Tạo bill thuốc**, ứng dụng desktop đa nền tảng (hỗ trợ Linux và Windows) được phát triển bằng Dart và Flutter. Đây là bản viết lại nâng cấp từ ứng dụng `Make-Bill` chạy trên Wails, mang lại giao diện Glassmorphism thời thượng, hiệu năng vượt trội và quy trình phân tích dữ liệu hiệu quả.
 
 ---
 

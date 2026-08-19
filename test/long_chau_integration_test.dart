@@ -92,27 +92,31 @@ void main() {
       await excelService.generateExcel(items, outputPath);
       expect(File(outputPath).existsSync(), isTrue);
 
-      // 6. Import back to verify E2E roundtrip
+      // 6. Import back to verify E2E roundtrip (sorted A-Z)
       final imported = await excelService.importExcel(outputPath);
       expect(imported.length, equals(3));
 
+      // Items sorted A-Z:
+      // 1. Bột Hapacol 150 ...
+      // 2. Thuốc Augmentin 1g ...
+      // 3. Viên nén Paracetamol Stada ...
       expect(imported[0].stt, equals(1));
-      expect(imported[0].name, equals(items[0].name));
-      expect(imported[0].brand, equals(items[0].brand));
-      expect(imported[0].quyCach, equals(items[0].quyCach));
-      expect(imported[0].quantity, equals(7));
+      expect(imported[0].name, contains('Bột Hapacol 150'));
+      expect(imported[0].brand, equals(items[2].brand));
+      expect(imported[0].quyCach, equals(items[2].quyCach));
+      expect(imported[0].quantity, equals(3));
 
       expect(imported[1].stt, equals(2));
-      expect(imported[1].name, equals(items[1].name));
+      expect(imported[1].name, contains('Augmentin 1g'));
       expect(imported[1].brand, equals(items[1].brand));
       expect(imported[1].quyCach, equals(items[1].quyCach));
       expect(imported[1].quantity, equals(1));
 
       expect(imported[2].stt, equals(3));
-      expect(imported[2].name, equals(items[2].name));
-      expect(imported[2].brand, equals(items[2].brand));
-      expect(imported[2].quyCach, equals(items[2].quyCach));
-      expect(imported[2].quantity, equals(3));
+      expect(imported[2].name, contains('Paracetamol Stada'));
+      expect(imported[2].brand, equals(items[0].brand));
+      expect(imported[2].quyCach, equals(items[0].quyCach));
+      expect(imported[2].quantity, equals(7));
     });
   });
 }

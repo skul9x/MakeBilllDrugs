@@ -73,8 +73,8 @@ cat > "debian-pack/usr/share/applications/${PACKAGE_NAME}.desktop" << DESKTOP_EO
 Version=${DEB_CONTROL_VERSION}
 Type=Application
 Terminal=false
-Name=Drugs Maker
-Comment=Drugs Maker Flutter Desktop Application
+Name=Tạo bill thuốc
+Comment=Tạo bill thuốc Flutter Desktop Application
 Exec=${PACKAGE_NAME}
 Icon=${PACKAGE_NAME}
 Categories=Office;Utility;
@@ -82,9 +82,16 @@ StartupWMClass=drugs_maker
 DESKTOP_EOF
 chmod +x "debian-pack/usr/share/applications/${PACKAGE_NAME}.desktop"
 
-# ── 6. Icon placeholder (1×1 PNG) ────────────────────────────
-echo "🖼️  Generating placeholder icon..."
-python3 - << 'PYEOF'
+# ── 6. Icon installation ─────────────────────────────────────
+echo "🖼️  Installing application icon..."
+if [[ -f "assets/icon/app_icon.png" ]]; then
+  cp "assets/icon/app_icon.png" "debian-pack/usr/share/pixmaps/tao-bill-thuoc.png"
+  cp "assets/icon/app_icon.png" "debian-pack/usr/share/pixmaps/${PACKAGE_NAME}.png"
+elif [[ -f "linux/runner/resources/app_icon.png" ]]; then
+  cp "linux/runner/resources/app_icon.png" "debian-pack/usr/share/pixmaps/tao-bill-thuoc.png"
+  cp "linux/runner/resources/app_icon.png" "debian-pack/usr/share/pixmaps/${PACKAGE_NAME}.png"
+else
+  python3 - << 'PYEOF'
 import base64
 png = base64.b64decode(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk'
@@ -92,7 +99,10 @@ png = base64.b64decode(
 )
 with open('debian-pack/usr/share/pixmaps/drugs-maker.png', 'wb') as f:
     f.write(png)
+with open('debian-pack/usr/share/pixmaps/tao-bill-thuoc.png', 'wb') as f:
+    f.write(png)
 PYEOF
+fi
 
 # ── 7. DEBIAN/control ────────────────────────────────────────
 echo "📄 Writing DEBIAN/control..."
@@ -105,8 +115,8 @@ Section: utils
 Priority: optional
 Architecture: ${ARCH}
 Installed-Size: ${INSTALLED_SIZE}
-Maintainer: Drugs Maker <support@example.com>
-Description: Drugs Maker — Trình quản lý hóa đơn thuốc (Flutter Desktop)
+Maintainer: Tạo bill thuốc <support@example.com>
+Description: Tạo bill thuốc — Trình quản lý hóa đơn thuốc (Flutter Desktop)
  Ứng dụng desktop đa nền tảng quản lý hóa đơn thuốc với giao diện
  Glassmorphism cao cấp.
 CONTROL_EOF

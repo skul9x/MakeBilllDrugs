@@ -45,11 +45,25 @@ static void my_application_activate(GApplication* application) {
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "drugs_maker");
+    gtk_header_bar_set_title(header_bar, "Tạo bill thuốc");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
-    gtk_window_set_title(window, "drugs_maker");
+    gtk_window_set_title(window, "Tạo bill thuốc");
+  }
+
+  // Set window icon if icon resource exists
+  const gchar* icon_paths[] = {
+      "resources/app_icon.png",
+      "/usr/share/pixmaps/tao-bill-thuoc.png",
+      "/usr/share/pixmaps/drugs-maker.png",
+      nullptr
+  };
+  for (int i = 0; icon_paths[i] != nullptr; i++) {
+    if (g_file_test(icon_paths[i], G_FILE_TEST_EXISTS)) {
+      gtk_window_set_icon_from_file(window, icon_paths[i], nullptr);
+      break;
+    }
   }
 
   gtk_window_set_default_size(window, 1280, 720);

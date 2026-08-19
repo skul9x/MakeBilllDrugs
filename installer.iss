@@ -3,7 +3,7 @@
 ; ============================================================
 
 #ifndef AppName
-  #define AppName "Drugs Maker"
+  #define AppName "Tạo bill thuốc"
 #endif
 
 #ifndef AppSlug

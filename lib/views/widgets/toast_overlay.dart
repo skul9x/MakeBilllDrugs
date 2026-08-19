@@ -35,15 +35,15 @@ class ToastWidget extends StatefulWidget {
   final Duration duration;
 
   const ToastWidget({
-    Key? key,
+    super.key,
     required this.message,
     required this.type,
     required this.onDismiss,
     required this.duration,
-  }) : super(key: key);
+  });
 
   @override
-  _ToastWidgetState createState() => _ToastWidgetState();
+  State<ToastWidget> createState() => _ToastWidgetState();
 }
 
 class _ToastWidgetState extends State<ToastWidget> with SingleTickerProviderStateMixin {
@@ -141,7 +141,7 @@ class _ToastWidgetState extends State<ToastWidget> with SingleTickerProviderStat
                     borderRadius: BorderRadius.circular(12.0),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

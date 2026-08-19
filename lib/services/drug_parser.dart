@@ -21,9 +21,8 @@ class DrugParser {
 
     // 1. Drug Name
     var nameNode = document.querySelector('h1');
-    if (nameNode == null) {
-      nameNode = document.querySelector('.product-name, .entry-title, .title-detail');
-    }
+    nameNode ??= document.querySelector('.product-name, .entry-title, .title-detail');
+
     if (nameNode == null) {
       throw Exception("could not find drug name in DOM structure");
     }

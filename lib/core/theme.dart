@@ -18,7 +18,7 @@ class GlassTheme {
         color: Colors.white,
         shadows: [
           Shadow(
-            color: primaryNeon.withOpacity(0.5),
+            color: primaryNeon.withValues(alpha: 0.5),
             blurRadius: 10,
           ),
         ],
@@ -32,7 +32,7 @@ class GlassTheme {
 
   static TextStyle get bodyStyle => GoogleFonts.inter(
         fontSize: 14,
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
       );
 
   static TextStyle get tableHeaderStyle => GoogleFonts.inter(
@@ -52,7 +52,7 @@ class GlassTheme {
         border: Border.all(color: glassBorder, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: Colors.black.withValues(alpha: 0.25),
             blurRadius: 16,
             spreadRadius: -4,
           ),

@@ -28,7 +28,7 @@ class DashboardPage extends StatefulWidget {
   final DialogService? dialogService;
   final DrugParser? drugParser;
 
-  const DashboardPage({Key? key, this.dialogService, this.drugParser}) : super(key: key);
+  const DashboardPage({super.key, this.dialogService, this.drugParser});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -137,12 +137,12 @@ class _DashboardPageState extends State<DashboardPage> {
           style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
           decoration: InputDecoration(
             hintText: 'Enter URL or HTML path',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -190,8 +190,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 side: const BorderSide(color: GlassTheme.primaryNeon),
               ),
             ).copyWith(
-              backgroundColor: MaterialStateProperty.resolveWith((states) {
-                return GlassTheme.primaryNeon.withOpacity(0.15);
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                return GlassTheme.primaryNeon.withValues(alpha: 0.15);
               }),
             ),
             onPressed: _isLoading ? null : _fetchAndAddDrug,
@@ -232,12 +232,12 @@ class _DashboardPageState extends State<DashboardPage> {
           style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
           decoration: InputDecoration(
             hintText: 'Tên thuốc',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -254,12 +254,12 @@ class _DashboardPageState extends State<DashboardPage> {
           style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
           decoration: InputDecoration(
             hintText: 'Thương hiệu',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -276,12 +276,12 @@ class _DashboardPageState extends State<DashboardPage> {
           style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
           decoration: InputDecoration(
             hintText: 'Quy cách',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
@@ -328,8 +328,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 side: const BorderSide(color: GlassTheme.primaryNeon),
               ),
             ).copyWith(
-              backgroundColor: MaterialStateProperty.resolveWith((states) {
-                return GlassTheme.primaryNeon.withOpacity(0.15);
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                return GlassTheme.primaryNeon.withValues(alpha: 0.15);
               }),
             ),
             onPressed: _addDrugManually,
@@ -355,16 +355,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _reindexItems() {
     setState(() {
-      for (int i = 0; i < _items.length; i++) {
-        final item = _items[i];
-        _items[i] = DrugItem(
-          stt: i + 1,
-          name: item.name,
-          brand: item.brand,
-          quyCach: item.quyCach,
-          quantity: item.quantity,
-        );
-      }
+      _items = DrugItem.sortAndReindex(_items);
     });
   }
 
@@ -612,7 +603,7 @@ class _DashboardPageState extends State<DashboardPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Drugs Maker',
+                'Tạo bill thuốc',
                 style: isMobile
                     ? GlassTheme.headerStyle.copyWith(fontSize: 22)
                     : GlassTheme.headerStyle,
@@ -645,9 +636,9 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildMobileTabSwitcher() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -663,7 +654,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 decoration: BoxDecoration(
                   color: _mobileViewTab == MobileViewTab.input
-                      ? GlassTheme.primaryNeon.withOpacity(0.18)
+                      ? GlassTheme.primaryNeon.withValues(alpha: 0.18)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(11),
                   border: _mobileViewTab == MobileViewTab.input
@@ -711,7 +702,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 decoration: BoxDecoration(
                   color: _mobileViewTab == MobileViewTab.table
-                      ? GlassTheme.primaryNeon.withOpacity(0.18)
+                      ? GlassTheme.primaryNeon.withValues(alpha: 0.18)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(11),
                   border: _mobileViewTab == MobileViewTab.table
@@ -814,9 +805,9 @@ class _DashboardPageState extends State<DashboardPage> {
           const SizedBox(height: 16.0),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
@@ -832,7 +823,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: _inputMode == InputMode.smartImport
-                            ? GlassTheme.primaryNeon.withOpacity(0.15)
+                            ? GlassTheme.primaryNeon.withValues(alpha: 0.15)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(11),
                         border: _inputMode == InputMode.smartImport
@@ -865,7 +856,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: _inputMode == InputMode.manualInput
-                            ? GlassTheme.primaryNeon.withOpacity(0.15)
+                            ? GlassTheme.primaryNeon.withValues(alpha: 0.15)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(11),
                         border: _inputMode == InputMode.manualInput
@@ -936,9 +927,9 @@ class _DashboardPageState extends State<DashboardPage> {
     Widget tableHeader = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         border: Border(
-          bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
         ),
       ),
       child: Row(
@@ -960,7 +951,7 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Text(
                 'No drug items parsed yet.',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   fontFamily: 'Inter',
                   fontSize: 15,
                 ),
@@ -983,12 +974,12 @@ class _DashboardPageState extends State<DashboardPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? GlassTheme.primaryNeon.withOpacity(0.1)
+                        ? GlassTheme.primaryNeon.withValues(alpha: 0.1)
                         : index % 2 == 0
-                            ? Colors.white.withOpacity(0.02)
+                            ? Colors.white.withValues(alpha: 0.02)
                             : Colors.transparent,
                     border: Border(
-                      bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+                      bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                     ),
                   ),
                   child: Row(
@@ -1097,9 +1088,9 @@ class _DashboardPageState extends State<DashboardPage> {
         vertical: isMobile ? 6.0 : 8.0,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1142,11 +1133,11 @@ class _DashboardPageState extends State<DashboardPage> {
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
-            side: BorderSide(color: color.withOpacity(0.5)),
+            side: BorderSide(color: color.withValues(alpha: 0.5)),
           ),
         ).copyWith(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            return color.withOpacity(0.05);
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            return color.withValues(alpha: 0.05);
           }),
         ),
         onPressed: onPressed,

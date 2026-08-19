@@ -7,11 +7,11 @@
 ;   build\windows\x64\runner\Release\
 ; ============================================================
 
-!define APP_NAME      "Drugs Maker"
+!define APP_NAME      "Tạo bill thuốc"
 !define APP_EXE       "drugs_maker.exe"
 !define APP_PUBLISHER "Nguyễn Duy Trường"
 !define APP_URL       "https://github.com/skul9x/MakeBilllDrugs"
-!define INSTALL_DIR   "$PROGRAMFILES64\Drugs Maker"
+!define INSTALL_DIR   "$PROGRAMFILES64\Tạo bill thuốc"
 !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\DrugsMaker"
 
 ; Version được ghi bởi CI vào file version.nsh

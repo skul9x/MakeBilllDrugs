@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:drugs_maker/views/dashboard_page.dart';
 import 'package:drugs_maker/services/mock_dialog_service.dart';
-import 'package:drugs_maker/models/drug_item.dart';
 
 void main() {
   testWidgets('Manual Input UI Tests - Tab Switching and Field Verification', (WidgetTester tester) async {
